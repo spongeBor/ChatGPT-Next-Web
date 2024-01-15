@@ -10,14 +10,19 @@ export async function POST(req: NextRequest) {
     const user = { username, password };
     const count = await getDocumentCount(user);
     if (!count) {
-      return NextResponse.json({ error: "用户名或密码错误" }, { status: 500 });
+      return NextResponse.json({ error: "用户名或密码错误" }, { status: 401 });
     }
     // jwt生成token
     const secretKey = process.env.JWT_SECRET || "bydone";
 
     const token = jwt.sign(user, secretKey, { expiresIn: "14d" });
     if (count) {
-      return NextResponse.json({ token }, { status: 200 });
+      return NextResponse.json(
+        { token },
+        {
+          status: 200,
+        },
+      );
     } else {
       return NextResponse.json(
         { error: "Failed to generate token" },

@@ -10,18 +10,39 @@ import BotIcon from "../icons/bot.svg";
 import { useEffect } from "react";
 import { getClientConfig } from "../config/client";
 
-export function AuthPage() {
-  const navigate = useNavigate();
+export function AuthPageCustom() {
   const accessStore = useAccessStore();
-
-  const goHome = () => navigate(Path.Home);
-  const goChat = () => navigate(Path.Chat);
+  const navigate = useNavigate();
   const resetAccessCode = () => {
     accessStore.update((access) => {
-      access.openaiApiKey = "";
-      access.accessCode = "";
+      access.username = "";
+      access.password = "";
     });
   }; // Reset access code to empty string
+
+  const confirm = async () => {
+    const username = accessStore.username;
+    const password = accessStore.password;
+    if (!username || !password) return;
+    try {
+      const result = await (
+        await fetch("api/login", {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+            // 添加其他必要的头部信息
+          },
+          body: JSON.stringify({ username, password }),
+        })
+      ).json();
+      if (result.token) {
+        localStorage.setItem("token", result.token);
+        navigate(Path.Home);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     if (getClientConfig()?.isApp) {
@@ -36,59 +57,41 @@ export function AuthPage() {
         <BotIcon />
       </div>
 
-      <div className={styles["auth-title"]}>{Locale.Auth.Title}</div>
-      <div className={styles["auth-tips"]}>{Locale.Auth.Tips}</div>
-
+      <div className={styles["auth-title"]}>{Locale.Auth.Login}</div>
+      <div className={styles["auth-tips"]}>{Locale.Auth.Tips2}</div>
       <input
         className={styles["auth-input"]}
-        type="password"
-        placeholder={Locale.Auth.Input}
-        value={accessStore.accessCode}
+        type="text"
+        placeholder={Locale.Auth.Username}
+        value={accessStore.username}
         onChange={(e) => {
           accessStore.update(
-            (access) => (access.accessCode = e.currentTarget.value),
+            (access) => (access.username = e.currentTarget.value),
           );
         }}
       />
-      {!accessStore.hideUserApiKey ? (
-        <>
-          <div className={styles["auth-tips"]}>{Locale.Auth.SubTips}</div>
-          <input
-            className={styles["auth-input"]}
-            type="password"
-            placeholder={Locale.Settings.Access.OpenAI.ApiKey.Placeholder}
-            value={accessStore.openaiApiKey}
-            onChange={(e) => {
-              accessStore.update(
-                (access) => (access.openaiApiKey = e.currentTarget.value),
-              );
-            }}
-          />
-          <input
-            className={styles["auth-input"]}
-            type="password"
-            placeholder={Locale.Settings.Access.Google.ApiKey.Placeholder}
-            value={accessStore.googleApiKey}
-            onChange={(e) => {
-              accessStore.update(
-                (access) => (access.googleApiKey = e.currentTarget.value),
-              );
-            }}
-          />
-        </>
-      ) : null}
+      <input
+        className={styles["auth-input"]}
+        type="password"
+        placeholder={Locale.Auth.Password}
+        value={accessStore.password}
+        onChange={(e) => {
+          accessStore.update(
+            (access) => (access.password = e.currentTarget.value),
+          );
+        }}
+      />
 
       <div className={styles["auth-actions"]}>
         <IconButton
           text={Locale.Auth.Confirm}
           type="primary"
-          onClick={goChat}
+          onClick={confirm}
         />
         <IconButton
-          text={Locale.Auth.Later}
+          text={Locale.Auth.Clear}
           onClick={() => {
             resetAccessCode();
-            goHome();
           }}
         />
       </div>
