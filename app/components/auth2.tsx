@@ -24,7 +24,6 @@ export function AuthPageCustom() {
   const confirm = () => {
     const username = accessStore.username;
     const password = accessStore.password;
-    console.log(username, password);
   };
 
   useEffect(() => {
