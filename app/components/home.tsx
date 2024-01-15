@@ -25,7 +25,7 @@ import {
 } from "react-router-dom";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
-import { AuthPage } from "./auth";
+import { AuthPageCustom } from "./auth2";
 import { getClientConfig } from "../config/client";
 import { ClientApi } from "../client/api";
 import { useAccessStore } from "../store";
@@ -146,7 +146,7 @@ function Screen() {
     >
       {isAuth ? (
         <>
-          <AuthPage />
+          <AuthPageCustom />
         </>
       ) : (
         <>
