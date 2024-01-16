@@ -9,6 +9,8 @@ import Locale from "../locales";
 import BotIcon from "../icons/bot.svg";
 import { useEffect } from "react";
 import { getClientConfig } from "../config/client";
+import { showToast } from "./ui-lib";
+import { genPwd } from "../utils/asr";
 
 export function AuthPageCustom() {
   const accessStore = useAccessStore();
@@ -30,14 +32,15 @@ export function AuthPageCustom() {
           method: "post",
           headers: {
             "Content-Type": "application/json",
-            // 添加其他必要的头部信息
           },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ username, password: genPwd(password) }),
         })
       ).json();
       if (result.token) {
         localStorage.setItem("token", result.token);
         navigate(Path.Home);
+      } else {
+        showToast(result.error);
       }
     } catch (err) {
       console.log(err);
@@ -74,7 +77,7 @@ export function AuthPageCustom() {
         className={styles["auth-input"]}
         type="password"
         placeholder={Locale.Auth.Password}
-        value={accessStore.password}
+        autoComplete="off"
         onChange={(e) => {
           accessStore.update(
             (access) => (access.password = e.currentTarget.value),

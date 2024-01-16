@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-import { getDocument } from "../db";
-import { compareHash } from "../hash";
 import { streamToString } from "../common";
+import { getDocument } from "../db";
+import { genPwdHash } from "../hash";
 import { genToken } from "../jwt";
+
 export async function POST(req: NextRequest) {
   try {
     const body = await streamToString(<any>req.body);
@@ -15,12 +15,13 @@ export async function POST(req: NextRequest) {
 
     const info = await getDocument({ username });
     if (!info) {
-      return NextResponse.json({ error: "用户名不存在" }, { status: 401 });
+      return NextResponse.json({ error: "用户已存在" }, { status: 401 });
     }
-    const result = await compareHash(password, info.password);
+    const result = await genPwdHash(password);
     if (!result) {
-      return NextResponse.json({ error: "密码错误" }, { status: 401 });
+      return NextResponse.json({ error: "token 生成错误" }, { status: 500 });
     }
+    // jwt生成token
     const token = genToken({ username, password: info.password }, "14d");
     return NextResponse.json(
       { token },

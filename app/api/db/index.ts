@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import model from "./userinfo-model";
+import mongoose, { connection } from "mongoose";
+import { getUserinfoModel } from "./util";
 
 const options: mongoose.ConnectOptions = {
   dbName: "common",
@@ -26,8 +26,19 @@ export async function getDocumentCount(filter: Record<string, any>) {
   try {
     const connection = await connect();
     if (!connection) return;
-    const count = await model.countDocuments(filter).exec();
+    const count = await getUserinfoModel().countDocuments(filter).exec();
     return count;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export async function getDocument(filter: Record<string, any>) {
+  try {
+    const connection = await connect();
+    if (!connection) return;
+    const document = await getUserinfoModel().findOne(filter).exec();
+    return document;
   } catch (err) {
     console.log(err);
   }
