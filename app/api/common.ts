@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSideConfig } from "../config/server";
-import { DEFAULT_MODELS, OPENAI_BASE_URL, GEMINI_BASE_URL } from "../constant";
+import { DEFAULT_MODELS, OPENAI_BASE_URL } from "../constant";
 import { collectModelTable } from "../utils/model";
 import { makeAzurePath } from "../azure";
 
@@ -137,20 +137,3 @@ export async function requestOpenai(req: NextRequest) {
     clearTimeout(timeoutId);
   }
 }
-export async function streamToString(stream: ReadableStream) {
-  const reader = stream.getReader();
-  let result = "";
-  let readingDone = false;
-
-  while (!readingDone) {
-    const { value, done } = await reader.read();
-    if (done) {
-      readingDone = true;
-    } else {
-      result += new TextDecoder().decode(value, { stream: true });
-    }
-  }
-
-  return result;
-}
-export const runtime = "nodejs";

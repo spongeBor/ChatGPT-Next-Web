@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { streamToString } from "../common";
-import { getDocument } from "../db";
-import { genPwdHash } from "../hash";
-import { genToken } from "../jwt";
+import { getDocument } from "../../db";
+import { genPwdHash } from "../../hash";
+import { genToken } from "../../jwt";
 
-export async function POST(req: NextRequest) {
+async function handle(req: NextRequest) {
   try {
-    const body = await streamToString(<any>req.body);
+    if (req.method !== "POST") {
+      return NextResponse.json({ error: "请求方法不允许" }, { status: 405 });
+    }
+    const body = await req.json();
     const { username = "", password = "" } = JSON.parse(body);
 
     if (!username || !password) {
@@ -33,3 +35,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Failed:${err}` }, { status: 500 });
   }
 }
+
+export const POST = handle;
+export const GET = handle;
+export const runtime = "nodejs";

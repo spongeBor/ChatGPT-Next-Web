@@ -43,6 +43,8 @@ const DEFAULT_ACCESS_STATE = {
   disableGPT4: false,
   disableFastLink: false,
   customModels: "",
+  // rsa_public_key
+  rp: "",
 };
 
 export const useAccessStore = createPersistStore(
@@ -93,6 +95,18 @@ export const useAccessStore = createPersistStore(
         .then((res: DangerConfig) => {
           console.log("[Config] got config from server", res);
           set(() => ({ ...res }));
+          // rp
+          fetch("/api/auth/", {
+            method: "get",
+            headers: { "context-type": "application/json" },
+          })
+            .then((res) => res.json())
+            .then((res) => {
+              set({ rp: res.reb });
+            })
+            .catch((e) => {
+              console.error(e);
+            });
         })
         .catch(() => {
           console.error("[Config] failed to fetch config");

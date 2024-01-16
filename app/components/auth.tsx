@@ -10,7 +10,7 @@ import BotIcon from "../icons/bot.svg";
 import { useEffect } from "react";
 import { getClientConfig } from "../config/client";
 import { showToast } from "./ui-lib";
-import { genPwd } from "../utils/asr";
+import { encryptData, genPwd } from "../utils/encoder";
 
 export function AuthPageCustom() {
   const accessStore = useAccessStore();
@@ -27,13 +27,17 @@ export function AuthPageCustom() {
     const password = accessStore.password;
     if (!username || !password) return;
     try {
+      const merge = await encryptData(
+        JSON.stringify({ username, password: genPwd(password) }),
+        accessStore.rp,
+      );
       const result = await (
-        await fetch("api/login", {
+        await fetch("api/auth/login", {
           method: "post",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ username, password: genPwd(password) }),
+          body: JSON.stringify({ ...merge }),
         })
       ).json();
       if (result.token) {
