@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { publicKey } from "../rsa";
+import { keyPair } from "../rsa";
 
 export async function GET(req: NextRequest) {
   try {
     return NextResponse.json(
-      { reb: publicKey },
+      { reb: keyPair.publicKey },
       {
         status: 200,
       },

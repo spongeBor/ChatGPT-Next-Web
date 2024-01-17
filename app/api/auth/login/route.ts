@@ -11,28 +11,23 @@ async function handle(req: NextRequest) {
     }
     const body = await req.json();
 
-    const { akb, edb, vb } = body;
-    const aaa = decryptData(akb);
-    console.log(1321);
-    // if(!merge) {
-    //   return NextResponse.json({ error: "请求错误" }, { status: 500 });
-    // }
+    const { username = "", password = "" } = decryptData(body);
 
-    // if (!username || !password) {
-    //   return NextResponse.json({ error: "请求错误" }, { status: 500 });
-    // }
+    if (!username || !password) {
+      return NextResponse.json({ error: "请求错误" }, { status: 500 });
+    }
 
-    // const info = await getDocument({ username });
-    // if (!info) {
-    //   return NextResponse.json({ error: "用户名不存在" }, { status: 401 });
-    // }
-    // const result = await compareHash(password, info.password);
-    // if (!result) {
-    //   return NextResponse.json({ error: "密码错误" }, { status: 401 });
-    // }
-    // const token = genToken({ username, password: info.password }, "14d");
+    const info = await getDocument({ username });
+    if (!info) {
+      return NextResponse.json({ error: "用户名不存在" }, { status: 401 });
+    }
+    const result = await compareHash(password, info.password);
+    if (!result) {
+      return NextResponse.json({ error: "密码错误" }, { status: 401 });
+    }
+    const token = genToken({ username, password: info.password }, "14d");
     return NextResponse.json(
-      { token: 1231 },
+      { token },
       {
         status: 200,
       },
