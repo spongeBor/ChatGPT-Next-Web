@@ -96,13 +96,13 @@ export const useAccessStore = createPersistStore(
           console.log("[Config] got config from server", res);
           set(() => ({ ...res }));
           // rp
-          fetch("/api/auth/", {
+          fetch("http://localhost:4000/auth", {
             method: "get",
-            headers: { "context-type": "application/json" },
+            headers: { "content-type": "application/json" },
           })
             .then((res) => res.json())
             .then((res) => {
-              set({ rp: res.reb });
+              set({ rp: atob(res.Reb) });
             })
             .catch((e) => {
               console.error(e);

@@ -32,7 +32,7 @@ export function AuthPageCustom() {
         accessStore.rp,
       );
       const result = await (
-        await fetch("api/auth/login", {
+        await fetch("http://localhost:4000/auth/login", {
           method: "post",
           headers: {
             "Content-Type": "application/json",
