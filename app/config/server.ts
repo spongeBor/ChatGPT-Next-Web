@@ -30,6 +30,12 @@ declare global {
       // google only
       GOOGLE_API_KEY?: string;
       GOOGLE_URL?: string;
+
+      // database
+      DATABASE_URL?: string;
+      DATABASE_NAME?: string;
+      DATABASE_USER?: string;
+      DATABASE_PASS?: string;
     }
   }
 }

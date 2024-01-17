@@ -1,14 +1,14 @@
-import mongoose, { connection } from "mongoose";
+import mongoose from "mongoose";
 import { getUserinfoModel } from "./util";
 
 const options: mongoose.ConnectOptions = {
-  dbName: "common",
-  user: "spongeBor",
-  pass: "123456",
+  dbName: process.env.DATABASE_NAME || "common",
+  user: process.env.DATABASE_USER || "spongeBor",
+  pass: process.env.DATABASE_PASS || "123456",
   minPoolSize: 10,
 };
 
-const dbUrl = "mongodb://localhost:27017";
+const dbUrl = process.env.DATABASE_URL || "mongodb://localhost:27017";
 
 // 创建模型
 

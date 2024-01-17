@@ -19,6 +19,11 @@ const en: LocaleType = {
     Input: "access code",
     Confirm: "Confirm",
     Later: "Later",
+    Login: "Login",
+    Tips2: "please input username and password",
+    Username: "Please input username",
+    Password: "Please input password",
+    Clear: "Clear",
   },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} messages`,

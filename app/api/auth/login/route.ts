@@ -17,15 +17,15 @@ async function handle(req: NextRequest) {
       return NextResponse.json({ error: "请求错误" }, { status: 500 });
     }
 
-    const info = await getDocument({ username });
-    if (!info) {
+    const innerInfo = await getDocument({ username });
+    if (!innerInfo) {
       return NextResponse.json({ error: "用户名不存在" }, { status: 401 });
     }
-    const result = await compareHash(password, info.password);
+    const result = await compareHash(password, innerInfo.password);
     if (!result) {
       return NextResponse.json({ error: "密码错误" }, { status: 401 });
     }
-    const token = genToken({ username, password: info.password }, "14d");
+    const token = genToken({ username, password: innerInfo.password }, "14d");
     return NextResponse.json(
       { token },
       {
