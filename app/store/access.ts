@@ -17,7 +17,6 @@ const DEFAULT_OPENAI_URL =
 const DEFAULT_ACCESS_STATE = {
   username: "",
   password: "",
-  accessCode: "",
   useCustomConfig: false,
 
   provider: ServiceProvider.OpenAI,
@@ -51,12 +50,6 @@ export const useAccessStore = createPersistStore(
   { ...DEFAULT_ACCESS_STATE },
 
   (set, get) => ({
-    enabledAccessControl() {
-      this.fetch();
-
-      return get().needCode;
-    },
-
     isValidOpenAI() {
       return ensure(get(), ["openaiApiKey"]);
     },
@@ -77,8 +70,7 @@ export const useAccessStore = createPersistStore(
         this.isValidOpenAI() ||
         this.isValidAzure() ||
         this.isValidGoogle() ||
-        !this.enabledAccessControl() ||
-        (this.enabledAccessControl() && ensure(get(), ["accessCode"]))
+        localStorage.getItem("token")
       );
     },
     fetch() {

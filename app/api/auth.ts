@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { getServerSideConfig } from "../config/server";
-import md5 from "spark-md5";
 import { ACCESS_CODE_PREFIX, ModelProvider } from "../constant";
+import { verifyToken } from "./jwt";
 
 function getIP(req: NextRequest) {
   let ip = req.ip ?? req.headers.get("x-real-ip");
@@ -19,7 +19,7 @@ function parseApiKey(bearToken: string) {
   const isApiKey = !token.startsWith(ACCESS_CODE_PREFIX);
 
   return {
-    accessCode: isApiKey ? "" : token.slice(ACCESS_CODE_PREFIX.length),
+    jwtToken: isApiKey ? "" : token.slice(ACCESS_CODE_PREFIX.length),
     apiKey: isApiKey ? token : "",
   };
 }
@@ -28,22 +28,28 @@ export function auth(req: NextRequest, modelProvider: ModelProvider) {
   const authToken = req.headers.get("Authorization") ?? "";
 
   // check if it is openai api key or user token
-  const { accessCode, apiKey } = parseApiKey(authToken);
-
-  const hashedCode = md5.hash(accessCode ?? "").trim();
+  const { jwtToken, apiKey } = parseApiKey(authToken);
 
   const serverConfig = getServerSideConfig();
-  console.log("[Auth] allowed hashed codes: ", [...serverConfig.codes]);
-  console.log("[Auth] got access code:", accessCode);
-  console.log("[Auth] hashed access code:", hashedCode);
+  console.log("[Auth] got token:", jwtToken);
   console.log("[User IP] ", getIP(req));
   console.log("[Time] ", new Date().toLocaleString());
 
-  if (serverConfig.needCode && !serverConfig.codes.has(hashedCode) && !apiKey) {
+  if (!jwtToken && !apiKey) {
     return {
       error: true,
-      msg: !accessCode ? "empty access code" : "wrong access code",
+      msg: "you are not login. please login first",
     };
+  }
+
+  if (jwtToken) {
+    const isValidToken = verifyToken(jwtToken);
+    if (!isValidToken) {
+      return {
+        error: true,
+        msg: "you token is timeout, please login again",
+      };
+    }
   }
 
   if (serverConfig.hideUserApiKey && !!apiKey) {
@@ -61,8 +67,8 @@ export function auth(req: NextRequest, modelProvider: ModelProvider) {
       modelProvider === ModelProvider.GeminiPro
         ? serverConfig.googleApiKey
         : serverConfig.isAzure
-        ? serverConfig.azureApiKey
-        : serverConfig.apiKey;
+          ? serverConfig.azureApiKey
+          : serverConfig.apiKey;
     if (systemApiKey) {
       console.log("[Auth] use system api key");
       req.headers.set("Authorization", `Bearer ${systemApiKey}`);

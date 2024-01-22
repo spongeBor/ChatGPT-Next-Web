@@ -153,8 +153,8 @@ export function getHeaders() {
   const apiKey = isGoogle
     ? accessStore.googleApiKey
     : isAzure
-    ? accessStore.azureApiKey
-    : accessStore.openaiApiKey;
+      ? accessStore.azureApiKey
+      : accessStore.openaiApiKey;
 
   const makeBearer = (s: string) => `${isAzure ? "" : "Bearer "}${s.trim()}`;
   const validString = (x: string) => x && x.length > 0;
@@ -162,12 +162,9 @@ export function getHeaders() {
   // use user's api key first
   if (validString(apiKey)) {
     headers[authHeader] = makeBearer(apiKey);
-  } else if (
-    accessStore.enabledAccessControl() &&
-    validString(accessStore.accessCode)
-  ) {
+  } else if (localStorage.getItem("token")) {
     headers[authHeader] = makeBearer(
-      ACCESS_CODE_PREFIX + accessStore.accessCode,
+      ACCESS_CODE_PREFIX + localStorage.getItem("token"),
     );
   }
 

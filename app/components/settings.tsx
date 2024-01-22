@@ -612,12 +612,6 @@ export function Settings() {
     });
   }
 
-  const enabledAccessControl = useMemo(
-    () => accessStore.enabledAccessControl(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
   const promptStore = usePromptStore();
   const builtinCount = SearchService.count.builtin;
   const customCount = promptStore.getUserPrompts().length ?? 0;
@@ -651,7 +645,6 @@ export function Settings() {
   }, []);
 
   const clientConfig = useMemo(() => getClientConfig(), []);
-  const showAccessCode = enabledAccessControl && !clientConfig?.isApp;
 
   return (
     <ErrorBoundary>
@@ -706,8 +699,8 @@ export function Settings() {
               checkingUpdate
                 ? Locale.Settings.Update.IsChecking
                 : hasNewVersion
-                ? Locale.Settings.Update.FoundUpdate(remoteId ?? "ERROR")
-                : Locale.Settings.Update.IsLatest
+                  ? Locale.Settings.Update.FoundUpdate(remoteId ?? "ERROR")
+                  : Locale.Settings.Update.IsLatest
             }
           >
             {checkingUpdate ? (
@@ -897,24 +890,6 @@ export function Settings() {
         </List>
 
         <List id={SlotID.CustomModel}>
-          {showAccessCode && (
-            <ListItem
-              title={Locale.Settings.Access.AccessCode.Title}
-              subTitle={Locale.Settings.Access.AccessCode.SubTitle}
-            >
-              <PasswordInput
-                value={accessStore.accessCode}
-                type="text"
-                placeholder={Locale.Settings.Access.AccessCode.Placeholder}
-                onChange={(e) => {
-                  accessStore.update(
-                    (access) => (access.accessCode = e.currentTarget.value),
-                  );
-                }}
-              />
-            </ListItem>
-          )}
-
           {!accessStore.hideUserApiKey && (
             <>
               {
